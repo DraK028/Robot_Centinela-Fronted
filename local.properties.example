@@ -1,0 +1,8 @@
+# Copia este archivo como local.properties (no se versiona) y reemplaza los valores ficticios.
+sdk.dir=/ruta/al/Android/Sdk
+
+# URL HTTPS del proyecto Supabase.
+supabase.url=https://tu-proyecto.supabase.co
+
+# Clave PÚBLICA del cliente (anon/publishable). Nunca uses service_role ni una clave sb_secret_.
+supabase.publishableKey=sb_publishable_valor_ficticio

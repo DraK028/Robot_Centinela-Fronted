@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Necesario para consultar Supabase (Auth, PostgREST y Realtime). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Sin Activity: esta versión solo contiene el backend de la app (sin UI). -->
+    <application
+        android:name=".shell.CentinelaApplication"
+        android:allowBackup="false"
+        android:label="Robot Centinela" />
+
+</manifest>

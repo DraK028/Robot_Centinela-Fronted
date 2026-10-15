@@ -33,3 +33,7 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Documentacion original del proyecto (symlink local, no se versiona).
+# Sin "/" final: git trata el symlink como archivo, no como directorio.
+/Documentacion-original

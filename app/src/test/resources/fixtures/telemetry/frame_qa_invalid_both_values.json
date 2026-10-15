@@ -1,0 +1,19 @@
+{
+"schema_version": "1.1",
+"event_id": "00000000-0000-4000-8000-000000000002",
+"device_id": "00000000-0000-4000-8000-0000000000d1",
+"boot_id": "00000000-0000-4000-8000-0000000000b1",
+"sequence": 8,
+"captured_at": "2026-10-11T15:24:14.000Z",
+"monotonic_ms": 16000,
+"clock_quality": "synced",
+"readings": [
+{"channel_key": "ir_floor_rear_left", "value": 1, "boolean_value": true, "quality": "valid", "calibration_id": null}
+],
+"battery": {"voltage_v": 11.4, "soc_pct": null, "current_a": null, "quality": "voltage_only"},
+"robot_state": "moving",
+"motors_active": true,
+"firmware_version": "0.2.0",
+"received_at": "2026-10-11T15:24:15Z",
+"stream_version": 8
+}
