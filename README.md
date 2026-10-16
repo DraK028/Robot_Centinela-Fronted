@@ -1,18 +1,19 @@
-# Robot Centinela: aplicación móvil (backend Android)
+# Robot Centinela: aplicación móvil (Android)
 
-Este repositorio contiene el **primer borrador del backend en Kotlin** de la app Android del proyecto
-**Robot Centinela**, un rover doméstico que monitorea gases y navega en dos dimensiones. Aquí
-"backend" significa las capas de la app que no son interfaz: dominio, casos de uso y adaptadores de
-datos.
+Este repositorio contiene la app Android del proyecto **Robot Centinela**, un rover doméstico que
+monitorea gases y navega en dos dimensiones: el **backend en Kotlin** (dominio, casos de uso y
+adaptadores de datos) y una **propuesta de frontend en Jetpack Compose** basada en la guía de
+interfaces *Lunar Base* (ver [docs/ui/propuesta-frontend.md](docs/ui/propuesta-frontend.md)).
 
 La app es de **consulta**. Lee de Supabase la telemetría y las alertas del robot que la ingesta
 persistió. **No controla el robot**: el inicio, la pausa y la parada son locales y el firmware es la
 autoridad de seguridad (expediente §1, §7.1). Tampoco calcula alertas: **la lógica de alertas, los
 umbrales y la histéresis viven en la base de datos**. La app solo los lee.
 
-> **Estado:** borrador inicial. No hay UI: el prototipo de interfaces se descartó y se espera el del
-> equipo de Ingeniería de Software. Varios contratos de datos son **provisionales** hasta que backend
-> publique el esquema de Supabase (ver [docs/pendientes.md](docs/pendientes.md)).
+> **Estado:** borrador. La interfaz es una **propuesta** sobre la guía de diseño de Ingeniería de
+> Software. Varios contratos de datos son **provisionales** hasta que backend publique el esquema de
+> Supabase (ver [docs/pendientes.md](docs/pendientes.md)). Sin Supabase configurado, la app arranca
+> con un **simulador de datos** rotulado como tal (HU15).
 
 ## Alcance de esta versión
 
@@ -25,9 +26,11 @@ umbrales y la histéresis viven en la base de datos**. La app solo los lee.
 | Historial de frames y alertas con filtro de fechas local convertido a UTC | HU07 |
 | Batería con método ("Porcentaje no disponible" si solo hay voltaje) | HU08 |
 | Pose con incertidumbre e IDs de mapa y misión (sin geometría de mapa) | HU05, HU06 (parcial) |
-| Fixtures sintéticos de prueba | HU15 (parcial) |
+| Fixtures sintéticos de prueba y simulador con escenarios de QA | HU15 |
+| Interfaz Compose: acceso, domicilio, Resumen, Mapa, Misiones, Historial, Eventos y Ajustes, con tema claro/oscuro | HU01 a HU08, HU12, HU20 |
+| Plano por versión de mapa y resumen de misión (contratos **provisionales**, solo en el simulador) | HU05, HU06, HU08 |
 
-**Fuera de esta versión:** la UI (HU12), los mapas y misiones completos, las calibraciones
+**Fuera de esta versión:** las calibraciones
 detalladas, la exportación CSV, push, video y comandos. La trazabilidad completa está en
 [docs/requirements/trazabilidad.md](docs/requirements/trazabilidad.md).
 
@@ -80,15 +83,20 @@ core/src/main/kotlin/com/robotcentinela/app/
   shared/                   intervalo UTC, paginación, errores
 app/src/main/kotlin/com/robotcentinela/app/
   <dominio>/adapters/supabase/   implementaciones de los puertos
-  shell/                         CentinelaApplication, AppContainer
+  <dominio>/adapters/demo/       implementaciones del simulador de datos (HU15)
+  shell/                         CentinelaApplication, AppContainer, Adapters (Supabase o simulador)
   shell/supabase/                cliente, configuración y nombres de recursos (provisionales)
+  shell/demo/                    mundo simulado: frames, misiones, planos y alertas sintéticos
+  ui/                            interfaz Compose: tema, componentes, pantallas y ViewModels
+  ui/model/                      reglas de presentación sin Android (textos, estados, formatos)
 docs/                       arquitectura, diccionario de datos, trazabilidad, decisiones, pendientes
 ```
 
 ## Requisitos
 
 - JDK 21.
-- Android SDK con la plataforma 36 (`compileSdk`/`targetSdk` 36, `minSdk` 26).
+- Android SDK con la plataforma 37 (`compileSdk` 37, `targetSdk` 36, `minSdk` 26). Compose 1.12,
+  Lifecycle 2.11 y Navigation 2.10 se publican compilados con API 37.
 - Gradle 9.6.0, incluido mediante el wrapper (`./gradlew`).
 
 ## Configuración
@@ -101,6 +109,7 @@ Las credenciales se leen de `local.properties`, que **no se versiona**. Copia
 | `sdk.dir` | Ruta al Android SDK. |
 | `supabase.url` | URL **HTTPS** del proyecto Supabase. |
 | `supabase.publishableKey` | Clave **pública** del cliente (anon o publishable). |
+| `centinela.dataSource` | Opcional: `supabase`, `demo` o vacío (Supabase si está configurado; si no, simulador). |
 
 La app **rechaza** claves privilegiadas (`service_role` o `sb_secret_...`): nunca deben llegar al
 teléfono (expediente §7.3, RNF08). Sin configuración, la app compila y arranca, y el error aparece
@@ -124,6 +133,7 @@ con un mensaje claro al usar el backend por primera vez.
 | [docs/requirements/trazabilidad.md](docs/requirements/trazabilidad.md) | HU, RF y RB, con su código, pruebas y estado |
 | [docs/decisions/](docs/decisions/) | Registro de decisiones de arquitectura (ADR) |
 | [docs/pendientes.md](docs/pendientes.md) | Preguntas abiertas para backend, IoT e Ingeniería de Software |
+| [docs/ui/propuesta-frontend.md](docs/ui/propuesta-frontend.md) | Propuesta de interfaz: pantallas, tokens, accesibilidad, simulador y hallazgos de la guía |
 
 La documentación de origen del proyecto (expediente técnico, historias de usuario y estructura JSON)
 está en `Documentacion-original/`, que se usa localmente y no se versiona.

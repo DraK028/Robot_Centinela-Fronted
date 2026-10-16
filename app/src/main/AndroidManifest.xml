@@ -4,10 +4,25 @@
     <!-- Necesario para consultar Supabase (Auth, PostgREST y Realtime). -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Sin Activity: esta versión solo contiene el backend de la app (sin UI). -->
+    <!-- Sin permiso de notificaciones: push (HU16) es una extensión opcional fuera de esta versión. -->
     <application
         android:name=".shell.CentinelaApplication"
         android:allowBackup="false"
-        android:label="Robot Centinela" />
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Centinela">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
 
 </manifest>

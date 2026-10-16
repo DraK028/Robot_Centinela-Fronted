@@ -1,0 +1,144 @@
+package com.robotcentinela.app.ui.settings
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.robotcentinela.app.BuildConfig
+import com.robotcentinela.app.R
+import com.robotcentinela.app.shell.DataSource
+import com.robotcentinela.app.shell.demo.DemoScenario
+import com.robotcentinela.app.ui.app.uiDependencies
+import com.robotcentinela.app.ui.components.AppIcon
+import com.robotcentinela.app.ui.theme.CentinelaShapes
+import com.robotcentinela.app.ui.theme.CentinelaTheme
+import com.robotcentinela.app.ui.theme.Spacing
+import com.robotcentinela.app.ui.theme.ThemePreference
+
+/** Ajustes y cuenta: tema, escenario de simulación, domicilio y sesión. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsSheet(homeName: String, onChangeHome: () -> Unit, onSignOut: () -> Unit, onDismiss: () -> Unit) {
+    val deps = uiDependencies
+    val colors = CentinelaTheme.colors
+    val theme by deps.preferences.theme.collectAsStateWithLifecycle()
+    val world = (deps.container.dataSource as? DataSource.Simulated)?.world
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = colors.surface,
+        contentColor = colors.textPrimary,
+    ) {
+        Column(
+            Modifier.verticalScroll(rememberScrollState()).padding(horizontal = Spacing.xl).padding(bottom = Spacing.xl).navigationBarsPadding(),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
+        ) {
+            Text("Ajustes", style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+
+            Text("Tema", style = MaterialTheme.typography.titleSmall)
+            Column(Modifier.selectableGroup()) {
+                ThemePreference.entries.forEach { option ->
+                    RadioRow(
+                        label = option.label,
+                        selected = option == theme,
+                        onSelect = { deps.preferences.setTheme(option) },
+                    )
+                }
+            }
+
+            if (world != null) {
+                HorizontalDivider(color = colors.border)
+                val scenario by world.scenario.collectAsState()
+                Text("Escenario de simulación", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    "Casos de prueba de la guía §12.6. Los datos son sintéticos y no generan avisos a residentes reales.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textSecondary,
+                )
+                Column(Modifier.selectableGroup()) {
+                    DemoScenario.entries.forEach { option ->
+                        RadioRow(
+                            label = option.label,
+                            description = option.description,
+                            selected = option == scenario,
+                            onSelect = { world.setScenario(option) },
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider(color = colors.border)
+            Text("Domicilio", style = MaterialTheme.typography.titleSmall)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                AppIcon(R.drawable.ic_home, tint = colors.textSecondary)
+                Text(homeName, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            }
+            OutlinedButton(onClick = onChangeHome, shape = CentinelaShapes.control, modifier = Modifier.fillMaxWidth().heightIn(min = CentinelaShapes.minTouchTarget)) {
+                Text("Cambiar de domicilio")
+            }
+            OutlinedButton(onClick = onSignOut, shape = CentinelaShapes.control, modifier = Modifier.fillMaxWidth().heightIn(min = CentinelaShapes.minTouchTarget)) {
+                AppIcon(R.drawable.ic_logout, tint = colors.textPrimary, modifier = Modifier.padding(end = Spacing.s))
+                Text("Cerrar sesión")
+            }
+
+            HorizontalDivider(color = colors.border)
+            Text(
+                "Robot Centinela ${BuildConfig.VERSION_NAME} · " +
+                    (if (world != null) "datos simulados" else "Supabase") +
+                    ". Esta app es de consulta: no envía comandos al robot.",
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.textSecondary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RadioRow(label: String, selected: Boolean, onSelect: () -> Unit, description: String? = null) {
+    val colors = CentinelaTheme.colors
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = CentinelaShapes.minTouchTarget)
+            .selectable(selected = selected, onClick = onSelect, role = Role.RadioButton)
+            .padding(vertical = Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = null,
+            colors = RadioButtonDefaults.colors(selectedColor = colors.primary, unselectedColor = colors.textSecondary),
+        )
+        Column(Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.bodyMedium)
+            description?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = colors.textSecondary) }
+        }
+    }
+}

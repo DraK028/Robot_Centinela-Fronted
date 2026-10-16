@@ -24,15 +24,31 @@
 | HU09 | Validación de calibraciones | Máxima | RF20, RF24, RF34; RB07 | `CalibrationId` en cada lectura | `TelemetryFrameMapperTest` | ⏳ Los detalles de calibración (fecha, responsable, vigencia) esperan su contrato |
 | HU10 | Confirmación MQTT / IoT | Máxima | RF03, RF04, RF30; RB02, RB03 | — | — | ➖ Firmware y puente de ingesta |
 | HU11 | Correlación de reportes | Máxima | RF15, RF29; RB21 a RB24 | `Alert` (solo lectura), `SupabaseAlertQueryAdapter` | `QueryAlertHistoryTest` | ➖ La correlación, la histéresis y los umbrales viven en la base de datos. La app solo lee incidentes |
-| HU12 | Preferencias visuales UI | Máxima | RF22, RF23 | — | — | ⏳ UI pendiente (equipo de Ingeniería de Software) |
+| HU12 | Preferencias visuales UI | Máxima | RF22, RF23 | `ui/theme` (tokens claro/oscuro, `ThemePreference`), `SettingsSheet` | — | 🟡 Propuesta implementada; falta validación con el equipo de diseño |
 | HU13 | Exportación de reportes | Media | RF21 | — | — | ⏳ Prioridad Should; el formato del CSV y su origen no están definidos |
 | HU14 | Auditoría técnica | Máxima | RF24, RF25 | — | — | ➖ Herramientas técnicas separadas (RF24); los dashboards de consulta no editan |
-| HU15 | Simulación de datos QA | Máxima | RF35; RB29 | Fixtures sintéticos en `app/src/test/resources/fixtures/telemetry/`; `TestFrames` | `TelemetryFrameMapperTest`, `TelemetrySynchronizerTest` | 🟡 Cubre nulls, calidades, duplicados y desconexiones. El emisor MQTT de prueba es de QA y backend |
+| HU15 | Simulación de datos QA | Máxima | RF35; RB29 | Fixtures sintéticos; `TestFrames`; simulador `shell/demo` con escenarios; rótulo `SimulationTag` | `TelemetryFrameMapperTest`, `TelemetrySynchronizerTest` | 🟡 Simulador local rotulado y sin salida a residentes. El emisor MQTT de prueba es de QA y backend |
 | HU16 | Notificaciones Push | Media | RF26 | — | — | ⏳ Extensión opcional (Should) |
 | HU17 | Video en LAN | Baja | RF27; RB33 | — | — | ⏳ Extensión opcional (Could) |
 | HU18 | Comandos remotos | Baja | RF28; RB32 | — | — | ⏳ Extensión opcional (Could), detrás de feature flag |
 | HU19 | Reutilización de mapa | Máxima | RF11, RF14, RF33 | — | — | ➖ La validación y el vínculo de mapas los hacen backend e IoT; la consulta espera el contrato de mapas |
 | HU20 | Sensores fallidos | Máxima | RF05, RF09, RF23; RB04, RB09 | `ReadingInterpreter` (`Fault`, `Warming`, `OutOfRange`, `NotInstalled`, `NoData`) | `ReadingInterpretationTest` | ✅ Los textos e íconos son de la UI |
+
+## Interfaz (propuesta Compose)
+
+| HU | Pantalla o componente | Qué cubre |
+|---|---|---|
+| HU01 | `LoginScreen`, `HomeSelectionScreen` | Acceso con errores ligados al campo; selección explícita de domicilio |
+| HU02, HU20 | `MetricCard`, `ChannelDetailSheet`, `ChannelPresentation` | Valor, unidad, calidad visible; ADC sin ppm; raya con "Sin dato", "No instalado", "Calentando", "Falla", "Fuera de rango" |
+| HU03 | `MainViewModel` | Sincronizador iniciado y detenido con el ciclo de vida; sin duplicados en la ruta |
+| HU04 | `MetricCard` | Edad del dato, "Atrasado" con hora exacta, hora aproximada marcada con "≈" |
+| HU05, HU06 | `FloorPlanView`, `MapScreen`, `MissionDetailScreen` | Trayectoria sobre la versión exacta de mapa; incertidumbre distinta de la huella; estaciones omitidas con causa |
+| HU07 | `HistoryScreen`, `EventsScreen` | Rango local a UTC; mín, máx y promedio; gráfica con huecos y tabla paginada |
+| HU08 | `OperationCard`, `MissionDetailScreen` | Voltaje con "Porcentaje no disponible" y método; consumo con método |
+| HU12 | `CentinelaTheme`, `SettingsSheet` | Tema elegido explícitamente, contraste, Poppins con dígitos tabulares |
+| HU15 | `SimulationTag`, simulador | "Datos simulados" en todas las pantallas; escenarios de QA |
+
+Pruebas de la interfaz: `PresentationTest` (reglas de presentación) y `ProvisionalContractsTest`.
 
 ## Reglas de negocio aplicadas en código
 

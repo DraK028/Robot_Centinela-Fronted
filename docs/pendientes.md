@@ -26,8 +26,12 @@ equipos. Cuando se resuelvan, se actualizan los archivos indicados.
 | R1 | Método de autenticación de Supabase Auth | Correo y contraseña, porque RF01 pide "recuperar acceso" |
 | R2 | Valores de `memberships.role` | Se conserva el texto; la app no autoriza por rol |
 | R3 | Dispositivos objetivo (versión mínima de Android) | `minSdk` 26 |
-| R4 | Prototipo de UI y requerimientos detallados | Sin UI en esta versión |
+| R4 | Validar la propuesta de interfaz (docs/ui/propuesta-frontend.md) contra el prototipo | Propuesta en Compose sobre la guía *Lunar Base* |
 | R5 | ¿Se prioriza CSV (HU13), push (HU16), video (HU17) o comandos (HU18)? | No implementados |
+
+| R6 | La guía exige 4.5:1 de contraste, pero `operational` y `warning` no lo alcanzan como texto sobre blanco en tema claro | Estados como insignias rellenas con texto oscuro; tokens derivados en `CentinelaColors.kt` |
+| R7 | Poppins no tiene números tabulares (`tnum`) | Variante con dígitos de ancho fijo incluida en `res/font` |
+| R8 | Catálogo de severidades para el filtro de eventos | `critical`, `warning`, `info` (ligado a B6) |
 
 ## Para IoT / firmware
 
@@ -40,7 +44,7 @@ equipos. Cuando se resuelvan, se actualizan los archivos indicados.
 ## Contratos de dominio pendientes
 
 - **Mapas** (HU05, HU19, RF11, RF32): formato de `map_versions`, habitaciones, estaciones, rutas y
-  Storage privado con URL firmada.
+  Storage privado con URL firmada. **Propuesta provisional:** `FloorPlan` y `FloorPlanPort` (ADR-005).
 - **Misiones** (HU06, HU08, RF14, RF33): resumen, estaciones previstas, completadas y omitidas con
-  causa, y consumo.
+  causa, y consumo. **Propuesta provisional:** `MissionSummary` y `MissionQueryPort` (ADR-005).
 - **Calibraciones** (HU09, RF20): fecha, método, responsable y vigencia.
